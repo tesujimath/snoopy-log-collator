@@ -1,4 +1,4 @@
-log-dir = "~/junk/snoopy-log"
+log-dir = "~/junk/snoopy-logs"
 collation-dir = "~/junk/snoopy-collation"
 
 [exclude]

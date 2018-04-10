@@ -18,6 +18,7 @@ import os
 import pwd
 import re
 import subprocess
+import sys
 
 class Mapper(object):
     def __init__(self):
@@ -61,7 +62,7 @@ class Mapper(object):
         else:
             rpm = subprocess.Popen(["rpm", "-qf", "--qf", "%{NAME}\n", path], stdout = subprocess.PIPE)
             line = rpm.stdout.readline().rstrip('\n')
-            if line.endswith('is not owned by any rpm'):
+            if line.endswith('is not owned by any package'):
                 package = None
             else:
                 package = line
@@ -73,12 +74,16 @@ class Mapper(object):
             repo = self._yum_repo_by_rpm[rpm]
         else:
             repo = None
-            yum = subprocess.Popen(["yum", "info", rpm], stdout = subprocess.PIPE)
+            yum = subprocess.Popen(["yum", "info", rpm], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
             for line in yum.stdout:
                 m = re.match(r"""From repo\s*:\s*(\S*)""", line)
                 if m:
                     repo = m.group(1)
                     break
+            if repo is None:
+                errorline = yum.stderr.read()
+                if errorline.startswith('Error'):
+                    sys.stderr.write('Mapper::yum_repo(%s) %s' % (rpm, errorline))
             self._yum_repo_by_rpm[rpm] = repo
         return repo
 
