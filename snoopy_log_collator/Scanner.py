@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
 import os
 import os.path
+import pendulum
 import re
 import sys
 
@@ -40,7 +40,7 @@ class Scanner(object):
             with open(self._last_collation_path()) as f:
                 m = timestampRE.match(f.read())
                 if m:
-                    return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=self._config.local_tzinfo)
+                    return pendulum.Pendulum(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=pendulum.now().timezone)
             return None
         except IOError, ValueError:
             return None
@@ -60,7 +60,7 @@ class Scanner(object):
                 logfile_year = int(m.group(1))
                 logfile_month = int(m.group(2))
                 logfile_day = int(m.group(3))
-                logfile_dt = datetime(logfile_year, logfile_month, logfile_day, tzinfo=self._config.local_tzinfo)
+                logfile_dt = pendulum.Pendulum(logfile_year, logfile_month, logfile_day, tzinfo=pendulum.now().timezone)
                 if last_collation_dt is None or last_collation_dt < logfile_dt:
                     reader = Reader(entry, logfile_dt, self._config)
                     sys.stderr.write('collating %s\n' % entry)

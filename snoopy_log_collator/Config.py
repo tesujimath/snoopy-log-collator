@@ -61,10 +61,6 @@ class Config(object):
             except toml.TomlError as e:
                 raise ConfigError(filename, 'TOML error at line %d' % e.line)
 
-        self._local_tzinfo = pytz.timezone(str(tzlocal.get_localzone()))
-        sys.stderr.write('local timezone is %s from %s\n' % (str(self._local_tzinfo), str(tzlocal.get_localzone())))
-        self._utc_tzinfo = pytz.timezone('UTC')
-
     @property
     def hostdir(self):
         return os.path.join(expand(self._config['collation-dir']), bare_hostname())
@@ -72,11 +68,3 @@ class Config(object):
     @property
     def logdir(self):
         return expand(self._config['log-dir'])
-
-    @property
-    def local_tzinfo(self):
-        return self._local_tzinfo
-
-    @property
-    def utc_tzinfo(self):
-        return self._utc_tzinfo

@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
 import gzip
 import os
+import pendulum
 import re
 
 def get_tagged_fields(s):
@@ -49,9 +49,7 @@ class Reader(object):
                     # except when we roll over from Dec to Jan
                     timestamp_s = m.group(1)
                     timestamp_year = self._logfile_dt.year - 1 if timestamp_s.startswith('Dec') and self._logfile_dt.month == 1 else self._logfile_dt.year
-                    naive = datetime.strptime('%d %s' % (timestamp_year, timestamp_s), '%Y %b %d %H:%M:%S')
-                    timestamp = datetime(naive.year, naive.month, naive.day, naive.hour, naive.minute, naive.second, tzinfo=self._config.local_tzinfo)
-
+                    timestamp = pendulum.parse('%d %s' % (timestamp_year, timestamp_s), tz=pendulum.now().timezone)
                     fields = get_tagged_fields(m.group(4))
                     command = m.group(5).rstrip()
                     collator.command(timestamp, fields, command)
