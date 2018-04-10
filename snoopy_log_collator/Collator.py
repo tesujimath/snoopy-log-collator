@@ -14,9 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from util import datetime_epoch
 import os.path
 import re
+import sys
 
 class Collator(object):
     def __init__(self, config, mapper):
@@ -28,6 +28,12 @@ class Collator(object):
             return os.path.join(self._config.hostdir, filename[1:])
         else:
             return os.path.join(self._config.hostdir, filename)
+
+    def _epoch_t(self, dt):
+        epoch = datetime.fromtimestamp(0, self._config.utc_tzinfo)
+        t = (dt - epoch).total_seconds()
+        sys.stderr.write('epoch from %s to %s = %d\n' % (str(epoch), str(dt), t))
+        return t
 
     def command(self, timestamp, fields, command):
         filename = fields['filename']
@@ -42,5 +48,5 @@ class Collator(object):
                     os.makedirs(output_dir)
             with open(output_path, 'a') as outf:
                 outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
-            t = datetime_epoch(timestamp, self._config.local_tzinfo)
+            t = self._epoch_t(timestamp)
             os.utime(output_path, (t, t))

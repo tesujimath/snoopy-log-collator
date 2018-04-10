@@ -16,9 +16,12 @@
 import os.path
 import pytoml as toml
 import pytz
+import sys
 import tzlocal
 
-from .util import bare_hostname
+def bare_hostname():
+    """Hostname without domain."""
+    return os.uname()[1].split('.')[0]
 
 def expand(s):
     return os.path.expanduser(os.path.expandvars(s))
@@ -59,6 +62,8 @@ class Config(object):
                 raise ConfigError(filename, 'TOML error at line %d' % e.line)
 
         self._local_tzinfo = pytz.timezone(str(tzlocal.get_localzone()))
+        sys.stderr.write('local timezone is %s from %s\n' % (str(self._local_tzinfo), str(tzlocal.get_localzone())))
+        self._utc_tzinfo = pytz.timezone('UTC')
 
     @property
     def hostdir(self):
@@ -71,3 +76,7 @@ class Config(object):
     @property
     def local_tzinfo(self):
         return self._local_tzinfo
+
+    @property
+    def utc_tzinfo(self):
+        return self._utc_tzinfo
