@@ -1,0 +1,71 @@
+# Copyright (c) 2018 Simon Guest
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from datetime import datetime
+import os
+import os.path
+import re
+import sys
+
+from .Collator import Collator
+from .Config import Config
+from .Mapper import Mapper
+from .Reader import Reader
+
+class Scanner(object):
+
+    def __init__(self, args):
+        self._config = Config(args)
+        self._mapper = Mapper()
+        self._collator = Collator(self._config, self._mapper)
+
+    def _last_collation_path(self):
+        return os.path.join(self._config.hostdir, '.processed')
+
+    def _get_last_collation(self):
+        timestampRE = re.compile(r"""^(\d\d\d\d)(\d\d)(\d\d)$""")
+        try:
+            with open(self._last_collation_path()) as f:
+                m = timestampRE.match(f.read())
+                if m:
+                    return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=self._config.local_tzinfo)
+            return None
+        except IOError, ValueError:
+            return None
+
+    def _set_last_collation(self, dt):
+        with open(self._last_collation_path(), 'w') as f:
+            f.write('%s\n' % dt.strftime('%Y%m%d'))
+
+    def scan(self):
+        last_collation_dt = self._get_last_collation()
+
+        # important to process logfiles in order, so timestamps are preserved
+        for entry in sorted(os.listdir(self._config.logdir)):
+            snoopyLogRE = re.compile(r"""^snoopy-(\d\d\d\d)(\d\d)(\d\d).gz$""")
+            m = snoopyLogRE.match(entry)
+            if m:
+                logfile_year = int(m.group(1))
+                logfile_month = int(m.group(2))
+                logfile_day = int(m.group(3))
+                logfile_dt = datetime(logfile_year, logfile_month, logfile_day, tzinfo=self._config.local_tzinfo)
+                if last_collation_dt is None or last_collation_dt < logfile_dt:
+                    reader = Reader(entry, logfile_dt, self._config)
+                    sys.stderr.write('collating %s\n' % entry)
+                    reader.collate_to(self._collator)
+                    last_collation_dt = logfile_dt
+                    self._set_last_collation(last_collation_dt)
+                else:
+                    sys.stderr.write('skipping %s\n' % entry)
