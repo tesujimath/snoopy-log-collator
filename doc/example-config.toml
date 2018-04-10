@@ -1,2 +1,2 @@
-log-dir = "/home/guestsi/junk/snoopy-log"
+log-dir = "~/junk/snoopy-log"
 collation-dir = "~/junk/snoopy-collation"

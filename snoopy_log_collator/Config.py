@@ -20,6 +20,9 @@ import tzlocal
 
 from .util import bare_hostname
 
+def expand(s):
+    return os.path.expanduser(os.path.expandvars(s))
+
 class ConfigError(Exception):
 
     def __init__(self, filename, msg):
@@ -59,11 +62,11 @@ class Config(object):
 
     @property
     def hostdir(self):
-        return os.path.join(self._config['collation-dir'], bare_hostname())
+        return os.path.join(expand(self._config['collation-dir']), bare_hostname())
 
     @property
     def logdir(self):
-        return self._config['log-dir']
+        return expand(self._config['log-dir'])
 
     @property
     def local_tzinfo(self):
