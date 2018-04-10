@@ -68,3 +68,24 @@ class Config(object):
     @property
     def logdir(self):
         return expand(self._config['log-dir'])
+
+    def include_rpm(self, name):
+        if 'include' in self._config:
+            include = self._config['include']
+            return 'rpm' in include and name in include['rpm']
+        else:
+            return False
+
+    def exclude_rpm(self, name):
+        if 'exclude' in self._config:
+            exclude = self._config['exclude']
+            return 'rpm' in exclude and name in exclude['rpm']
+        else:
+            return False
+
+    def exclude_yum_repo(self, name):
+        if 'exclude' in self._config:
+            exclude = self._config['exclude']
+            return 'yum-repo' in exclude and name in exclude['yum-repo']
+        else:
+            return False

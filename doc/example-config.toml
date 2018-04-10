@@ -1,2 +1,16 @@
 log-dir = "~/junk/snoopy-log"
 collation-dir = "~/junk/snoopy-collation"
+
+[exclude]
+yum-repo = [
+#    "anaconda",
+]
+
+rpm = [
+#    "util-linux",
+]
+
+[include]
+rpm = [
+#    "findutils",
+]

@@ -18,7 +18,6 @@ import os
 import pwd
 import re
 import subprocess
-import sys
 
 class Mapper(object):
     def __init__(self):
@@ -26,6 +25,7 @@ class Mapper(object):
         self._yum_repo_by_rpm = {}
         self._username = {}
         self._exists = {}
+        self._excluded = {}
 
     def username(self, uid):
         if uid not in self._username:
@@ -81,3 +81,26 @@ class Mapper(object):
                     break
             self._yum_repo_by_rpm[rpm] = repo
         return repo
+
+    def excluded(self, path, config):
+        """Look up config and return whether this path is excluded."""
+        if path in self._excluded:
+            return self._excluded[path]
+        else:
+            package = self.rpm(path)
+            if package is None:
+                excluded = False
+            elif config.include_rpm(package):
+                excluded = False
+            elif config.exclude_rpm(package):
+                excluded = True
+            else:
+                repo = self.yum_repo(package)
+                if repo is None:
+                    excluded = False
+                elif config.exclude_yum_repo(repo):
+                    excluded = True
+                else:
+                    excluded = False
+            self._excluded[path] = excluded
+            return excluded

@@ -34,7 +34,7 @@ class Collator(object):
         if not os.path.isabs(filename):
             filename = os.path.normpath(os.path.join(fields['cwd'], filename))
         user = self._mapper.username(int(fields['uid']))
-        if self._mapper.exists(filename):
+        if self._mapper.exists(filename) and not self._mapper.excluded(filename, self._config):
             output_path = self._output_path(filename)
             if not os.path.exists(output_path):
                 output_dir = os.path.dirname(output_path)
