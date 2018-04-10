@@ -19,15 +19,22 @@ import argparse
 import sys
 
 from snoopy_log_collator.Config import ConfigError
+from snoopy_log_collator.PostProcessor import PostProcessor
 from snoopy_log_collator.Scanner import Scanner
 
 def main():
     parser = argparse.ArgumentParser(description='collate snoopy logfiles')
-    parser.add_argument('-c', '--config', dest='config', metavar='FILE', help='configuration file')
+    parser.add_argument('--list-packages', action='store_true', help='list packages for collated commands')
+    parser.add_argument('-c', '--config', metavar='FILE', help='configuration file')
     args = parser.parse_args()
+
     try:
-        scanner = Scanner(args)
-        scanner.scan()
+        if args.list_packages:
+            p = PostProcessor(args)
+            p.list_packages()
+        else:
+            scanner = Scanner(args)
+            scanner.scan()
     except ConfigError as e:
         sys.stderr.write('%s\n' % e)
         sys.exit(1)

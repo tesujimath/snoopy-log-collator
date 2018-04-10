@@ -21,7 +21,7 @@ import sys
 
 class Mapper(object):
     def __init__(self):
-        self._package = {}
+        self._rpm = {}
         self._username = {}
         self._exists = {}
 
@@ -53,15 +53,15 @@ class Mapper(object):
             self._exists[path] = result
         return result
 
-    def package(self, path):
-        if path in self._package:
-            package = self._package[path]
+    def rpm(self, path):
+        if path in self._rpm:
+            rpm = self._rpm[path]
         else:
             rpm = subprocess.Popen(["rpm", "-qf", "--qf", "%{NAME}\n", path], stdout = subprocess.PIPE)
             line = rpm.stdout.readline().rstrip('\n')
-            if line.endswith('is not owned by any package'):
-                package = None
+            if line.endswith('is not owned by any rpm'):
+                rpm = None
             else:
-                package = line
-            self._package[path] = package
-        return package
+                rpm = line
+            self._rpm[path] = rpm
+        return rpm
