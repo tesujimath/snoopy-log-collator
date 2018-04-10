@@ -16,12 +16,14 @@
 import errno
 import os
 import pwd
+import re
 import subprocess
 import sys
 
 class Mapper(object):
     def __init__(self):
-        self._rpm = {}
+        self._rpm_by_path = {}
+        self._yum_repo_by_rpm = {}
         self._username = {}
         self._exists = {}
 
@@ -54,14 +56,28 @@ class Mapper(object):
         return result
 
     def rpm(self, path):
-        if path in self._rpm:
-            rpm = self._rpm[path]
+        if path in self._rpm_by_path:
+            package = self._rpm_by_path[path]
         else:
             rpm = subprocess.Popen(["rpm", "-qf", "--qf", "%{NAME}\n", path], stdout = subprocess.PIPE)
             line = rpm.stdout.readline().rstrip('\n')
             if line.endswith('is not owned by any rpm'):
-                rpm = None
+                package = None
             else:
-                rpm = line
-            self._rpm[path] = rpm
-        return rpm
+                package = line
+            self._rpm_by_path[path] = package
+        return package
+
+    def yum_repo(self, rpm):
+        if rpm in self._yum_repo_by_rpm:
+            repo = self._yum_repo_by_rpm[rpm]
+        else:
+            repo = None
+            yum = subprocess.Popen(["yum", "info", rpm], stdout = subprocess.PIPE)
+            for line in yum.stdout:
+                m = re.match(r"""From repo\s*:\s*(\S*)""", line)
+                if m:
+                    repo = m.group(1)
+                    break
+            self._yum_repo_by_rpm[rpm] = repo
+        return repo

@@ -36,5 +36,6 @@ class PostProcessor(object):
 
     def list_packages(self):
         for path in sorted(self._get_collated_files()):
-            rpm = self._mapper.rpm(path)
-            print('%s:%s' % (str(rpm), path))
+            package = self._mapper.rpm(path)
+            repo = self._mapper.yum_repo(package) if package is not None else None
+            print('%s:%s:%s' % (str(repo), str(package), path))
