@@ -31,16 +31,22 @@ class Collator(object):
 
     def command(self, timestamp, fields, command):
         filename = fields['filename']
-        if not os.path.isabs(filename):
-            filename = os.path.normpath(os.path.join(fields['cwd'], filename))
+        if os.path.isabs(filename):
+            filepath = filename
+        else:
+            filepath = os.path.normpath(os.path.join(fields['cwd'], filename))
         user = self._mapper.username(int(fields['uid']))
-        if self._mapper.exists(filename) and not self._mapper.excluded(filename, self._config):
-            output_path = self._output_path(filename)
+        if self._mapper.isfile(filepath) and not self._mapper.excluded(filepath, self._config):
+            output_path = self._output_path(filepath)
             if not os.path.exists(output_path):
                 output_dir = os.path.dirname(output_path)
                 if not os.path.exists(output_dir):
                     os.makedirs(output_dir)
-            with open(output_path, 'a') as outf:
-                outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
+            try:
+                with open(output_path, 'a') as outf:
+                    outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
+            except IOError:
+                sys.stderr.write('open "%s" failed for "%s"\n' % (output_path, filepath))
+                raise
             t = timestamp.int_timestamp
             os.utime(output_path, (t, t))

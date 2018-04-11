@@ -15,6 +15,7 @@
 
 import errno
 import os
+import os.path
 import pwd
 import re
 import subprocess
@@ -25,7 +26,7 @@ class Mapper(object):
         self._rpm_by_path = {}
         self._yum_repo_by_rpm = {}
         self._username = {}
-        self._exists = {}
+        self._isfile = {}
         self._excluded = {}
 
     def username(self, uid):
@@ -40,21 +41,14 @@ class Mapper(object):
             name = self._username[uid]
         return name
 
-    def exists(self, path):
-        """Whether path exists in the filesystem."""
-        if path in self._exists:
-            result = self._exists[path]
+    def isfile(self, path):
+        """Whether path is a regular file (or symlink to one) in the filesystem."""
+        if path in self._isfile:
+            isfile = self._isfile[path]
         else:
-            try:
-                s = os.stat(path)
-                result = True
-            except OSError as e:
-                if e.errno == errno.ENOENT or e.errno == errno.EACCES:
-                    result = False
-                else:
-                    raise
-            self._exists[path] = result
-        return result
+            isfile = os.path.isfile(path)
+            self._isfile[path] = isfile
+        return isfile
 
     def rpm(self, path):
         if path in self._rpm_by_path:
