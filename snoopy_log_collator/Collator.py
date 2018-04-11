@@ -22,11 +22,11 @@ class Collator(object):
         self._config = config
         self._mapper = mapper
 
-    def _output_path(self, filename):
+    def _output_path(self, cls, filename):
         if os.path.isabs(filename):
-            return os.path.join(self._config.hostdir, filename[1:])
+            return os.path.join(self._config.collationdir(cls), filename[1:])
         else:
-            return os.path.join(self._config.hostdir, filename)
+            return os.path.join(self._config.collationdir(cls), filename)
 
     def command(self, timestamp, fields, command):
         filename = fields['filename']
@@ -35,13 +35,15 @@ class Collator(object):
         else:
             filepath = os.path.normpath(os.path.join(fields['cwd'], filename))
         user = self._mapper.username(int(fields['uid']))
-        if self._mapper.isfile(filepath) and not self._mapper.excluded(filepath, self._config):
-            output_path = self._output_path(filepath)
-            if not os.path.exists(output_path):
-                output_dir = os.path.dirname(output_path)
-                if not os.path.exists(output_dir):
-                    os.makedirs(output_dir)
-            with open(output_path, 'a') as outf:
-                outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
-            t = timestamp.int_timestamp
-            os.utime(output_path, (t, t))
+        if self._mapper.isfile(filepath):
+            for cls in self._config.classes:
+                if not self._mapper.excluded(filepath, cls, self._config):
+                    output_path = self._output_path(cls, filepath)
+                    if not os.path.exists(output_path):
+                        output_dir = os.path.dirname(output_path)
+                        if not os.path.exists(output_dir):
+                            os.makedirs(output_dir)
+                    with open(output_path, 'a') as outf:
+                        outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
+                    t = timestamp.int_timestamp
+                    os.utime(output_path, (t, t))

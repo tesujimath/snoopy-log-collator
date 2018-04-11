@@ -24,10 +24,11 @@ class PostProcessor(object):
         self._config = Config(args)
         self._mapper = Mapper()
 
-    def _get_collated_files(self):
+    def _get_collated_files(self, cls):
         collated = []
-        n = len(self._config.hostdir)
-        for root, dirs, files in os.walk(self._config.hostdir):
+        collationdir = self._config.collationdir(cls)
+        n = len(collationdir)
+        for root, dirs, files in os.walk(collationdir):
             for filename in files:
                 path = os.path.join(root, filename)[n:]
                 if path != '/.processed':
@@ -35,7 +36,19 @@ class PostProcessor(object):
         return collated
 
     def list_packages(self):
-        for path in sorted(self._get_collated_files()):
+        for path in sorted(self._get_collated_files('all')):
             package = self._mapper.rpm(path)
             repo = self._mapper.yum_repo(package) if package is not None else None
             print('%s:%s:%s' % (str(repo), str(package), path))
+
+    def purge_empty_dirs(self, cls):
+        for root, dirs, files in os.walk(self._config.collationdir(cls)):
+            for dirname in dirs:
+                path = os.path.join(root, dirname)
+                print('rm %s ' % path)
+
+    def purge_excluded(self, cls):
+        for path in sorted(self._get_collated_files(cls)):
+            if self._mapper.excluded(filename, self._config):
+                print('rm %s ' % filename)
+        self.purge_empty_dirs(cls)

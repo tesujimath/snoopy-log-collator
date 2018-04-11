@@ -81,25 +81,28 @@ class Mapper(object):
             self._yum_repo_by_rpm[rpm] = repo
         return repo
 
-    def excluded(self, path, config):
-        """Look up config and return whether this path is excluded."""
-        if path in self._excluded:
-            return self._excluded[path]
+    def excluded(self, path, cls, config):
+        """Look up config and return whether this path is excluded for cls."""
+        if cls not in self._excluded:
+            self._excluded[cls] = {}
+        excluded_for_class = self._excluded[cls]
+        if path in excluded_for_class:
+            return excluded_for_class[path]
         else:
             package = self.rpm(path)
             if package is None:
                 excluded = False
-            elif config.include_rpm(package):
+            elif config.include_rpm(cls, package):
                 excluded = False
-            elif config.exclude_rpm(package):
+            elif config.exclude_rpm(cls, package):
                 excluded = True
             else:
                 repo = self.yum_repo(package)
                 if repo is None:
                     excluded = False
-                elif config.exclude_yum_repo(repo):
+                elif config.exclude_yum_repo(cls, repo):
                     excluded = True
                 else:
                     excluded = False
-            self._excluded[path] = excluded
+            excluded_for_class[path] = excluded
             return excluded

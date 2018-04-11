@@ -1,16 +1,16 @@
-log-dir = "~/junk/snoopy-logs"
-collation-dir = "~/junk/snoopy-logs/collated"
+log-dir = "~/junk/snoopy-log"
+collation-dir = "~/junk/snoopy-log/collated"
 
-[exclude]
+[class.bifo.exclude]
 yum-repo = [
-#    "anaconda",
+    "anaconda",
 ]
 
 rpm = [
-#    "util-linux",
+    "util-linux",
 ]
 
-[include]
+[class.bifo.include]
 rpm = [
-#    "findutils",
+    "findutils",
 ]

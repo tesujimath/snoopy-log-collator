@@ -32,12 +32,12 @@ class Scanner(object):
         self._collator = Collator(self._config, self._mapper)
 
     def _last_collation_path(self):
-        return os.path.join(self._config.hostdir, '.processed')
+        return os.path.join(self._config.processedfile)
 
     def _get_last_collation(self):
         timestampRE = re.compile(r"""^(\d\d\d\d)(\d\d)(\d\d)$""")
         try:
-            with open(self._last_collation_path()) as f:
+            with open(self._config.last_collation_file) as f:
                 m = timestampRE.match(f.read())
                 if m:
                     return pendulum.Pendulum(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=pendulum.now().timezone)
@@ -46,7 +46,7 @@ class Scanner(object):
             return None
 
     def _set_last_collation(self, dt):
-        with open(self._last_collation_path(), 'w') as f:
+        with open(self._config.last_collation_file, 'w') as f:
             f.write('%s\n' % dt.strftime('%Y%m%d'))
 
     def scan(self):
