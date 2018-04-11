@@ -54,7 +54,7 @@ class Mapper(object):
         if path in self._rpm_by_path:
             package = self._rpm_by_path[path]
         else:
-            rpm = subprocess.Popen(["rpm", "-qf", "--qf", "%{NAME}\n", path], stdout = subprocess.PIPE)
+            rpm = subprocess.Popen(["rpm", "-qf", "--qf", "%{NAME}\n", path], stdout = subprocess.PIPE, universal_newlines=True)
             line = rpm.stdout.readline().rstrip('\n')
             if line.endswith('is not owned by any package'):
                 package = None
@@ -68,7 +68,7 @@ class Mapper(object):
             repo = self._yum_repo_by_rpm[rpm]
         else:
             repo = None
-            yum = subprocess.Popen(["yum", "info", rpm], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            yum = subprocess.Popen(["yum", "info", rpm], stdout = subprocess.PIPE, stderr = subprocess.PIPE, universal_newlines=True)
             for line in yum.stdout:
                 m = re.match(r"""From repo\s*:\s*(\S*)""", line)
                 if m:

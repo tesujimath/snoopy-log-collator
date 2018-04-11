@@ -16,7 +16,6 @@
 import os.path
 import pendulum
 import re
-import sys
 
 class Collator(object):
     def __init__(self, config, mapper):
@@ -42,11 +41,7 @@ class Collator(object):
                 output_dir = os.path.dirname(output_path)
                 if not os.path.exists(output_dir):
                     os.makedirs(output_dir)
-            try:
-                with open(output_path, 'a') as outf:
-                    outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
-            except IOError:
-                sys.stderr.write('open "%s" failed for "%s"\n' % (output_path, filepath))
-                raise
+            with open(output_path, 'a') as outf:
+                outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
             t = timestamp.int_timestamp
             os.utime(output_path, (t, t))

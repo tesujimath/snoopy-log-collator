@@ -17,6 +17,7 @@ import gzip
 import os
 import pendulum
 import re
+import sys
 
 def get_tagged_fields(s):
     """Extract tagged snoopy fields as a dict."""
@@ -26,7 +27,7 @@ def get_tagged_fields(s):
     cunningSplit = re.split(cunningRE, s)
     toks = cunningSplit[0].split(':', 1) + cunningSplit[1:]
     fields = {}
-    for i in range(len(toks) / 2):
+    for i in range(len(toks) // 2):
         tag = toks[2 * i].lstrip().rstrip(':')
         value = toks[2 * i + 1]
         fields[tag] = value
@@ -41,8 +42,11 @@ class Reader(object):
     def collate_to(self, collator):
         loglineRE = re.compile(r"""^(\w+\s+\d+\s+\d+:\d+:\d+)\s+(\w+)\s+\w+\[(\d+)\]:\s+\[([^\]]*)\]:\s+(.*)$""")
         logf = gzip.open(self._logpath)
+        loglineno = 0
         try:
-            for logline in logf:
+            for logline_bytes in logf:
+                logline = logline_bytes.decode('utf-8')
+                loglineno += 1
                 m = loglineRE.match(logline)
                 if m:
                     # infer the year for the timestamp, which is usually the same as the logfile year,
@@ -55,5 +59,8 @@ class Reader(object):
                     collator.command(timestamp, fields, command)
                 else:
                     print("failed on %s" % logline.rstrip('\n'))
+        except:
+            sys.stderr.write('failed at %s:%d\n' % (self._logpath, loglineno))
+            raise
         finally:
             logf.close()

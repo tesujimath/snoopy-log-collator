@@ -42,7 +42,7 @@ class Scanner(object):
                 if m:
                     return pendulum.Pendulum(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=pendulum.now().timezone)
             return None
-        except IOError, ValueError:
+        except (IOError, ValueError):
             return None
 
     def _set_last_collation(self, dt):
