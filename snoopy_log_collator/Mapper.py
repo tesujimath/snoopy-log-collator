@@ -54,12 +54,12 @@ class Mapper(object):
         if path in self._rpm_by_path:
             package = self._rpm_by_path[path]
         else:
-            rpm = subprocess.Popen(["rpm", "-qf", "--qf", "%{NAME}\n", path], stdout = subprocess.PIPE, universal_newlines=True)
-            line = rpm.stdout.readline().rstrip('\n')
-            if line.endswith('is not owned by any package'):
-                package = None
-            else:
-                package = line
+            package = None
+            if os.path.exists(path):
+                rpm = subprocess.Popen(["rpm", "-qf", "--qf", "%{NAME}\n", path], stdout = subprocess.PIPE, universal_newlines=True)
+                line = rpm.stdout.readline().rstrip('\n')
+                if not line.endswith('is not owned by any package'):
+                    package = line
             self._rpm_by_path[path] = package
         return package
 
