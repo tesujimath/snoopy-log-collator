@@ -15,9 +15,7 @@
 
 import os.path
 import pytoml as toml
-import pytz
 import sys
-import tzlocal
 
 def bare_hostname():
     """Hostname without domain."""
@@ -71,7 +69,7 @@ class Config(object):
 
     @property
     def last_collation_file(self):
-        return os.path.join(expand(self._config['collation-dir']), '.%s.processed' % bare_hostname())
+        return os.path.join(expand(self._config['collation-dir']), '.%s.collated' % bare_hostname())
 
     @property
     def logdir(self):

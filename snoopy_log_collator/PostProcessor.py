@@ -31,7 +31,7 @@ class PostProcessor(object):
         for root, dirs, files in os.walk(collationdir):
             for filename in files:
                 path = os.path.join(root, filename)[n:]
-                if path != '/.processed':
+                if path != '/.collated':
                     collated.append(path)
         return collated
 

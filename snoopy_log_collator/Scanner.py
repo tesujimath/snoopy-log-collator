@@ -31,9 +31,6 @@ class Scanner(object):
         self._mapper = Mapper()
         self._collator = Collator(self._config, self._mapper)
 
-    def _last_collation_path(self):
-        return os.path.join(self._config.processedfile)
-
     def _get_last_collation(self):
         timestampRE = re.compile(r"""^(\d\d\d\d)(\d\d)(\d\d)$""")
         try:
