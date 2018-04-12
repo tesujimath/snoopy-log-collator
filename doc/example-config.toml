@@ -1,9 +1,15 @@
-log-dir = "~/junk/snoopy-logs"
+log-dir = "~/junk/snoopy-logs"  # usually "/var/log"
 collation-dir = "~/junk/snoopy-logs/collated"
 
 [class.bifo.exclude]
 yum-repo = [
     "anaconda",
+    "base",
+    "centos7-os",
+    "centos7-updates",
+    "epel",
+    "epel7",
+    "updates",
 ]
 
 rpm = [
@@ -12,5 +18,5 @@ rpm = [
 
 [class.bifo.include]
 rpm = [
-    "findutils",
+    "R-core",
 ]
