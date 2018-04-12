@@ -45,20 +45,23 @@ class Reader(object):
         loglineno = 0
         try:
             for logline_bytes in logf:
-                logline = logline_bytes.decode('utf-8')
-                loglineno += 1
-                m = loglineRE.match(logline)
-                if m:
-                    # infer the year for the timestamp, which is usually the same as the logfile year,
-                    # except when we roll over from Dec to Jan
-                    timestamp_s = m.group(1)
-                    timestamp_year = self._logfile_dt.year - 1 if timestamp_s.startswith('Dec') and self._logfile_dt.month == 1 else self._logfile_dt.year
-                    timestamp = pendulum.parse('%d %s' % (timestamp_year, timestamp_s), tz=pendulum.now().timezone)
-                    fields = get_tagged_fields(m.group(4))
-                    command = m.group(5).rstrip()
-                    collator.command(timestamp, fields, command)
-                else:
-                    print("failed on %s" % logline.rstrip('\n'))
+                try:
+                    logline = logline_bytes.decode('utf-8')
+                    loglineno += 1
+                    m = loglineRE.match(logline)
+                    if m:
+                        # infer the year for the timestamp, which is usually the same as the logfile year,
+                        # except when we roll over from Dec to Jan
+                        timestamp_s = m.group(1)
+                        timestamp_year = self._logfile_dt.year - 1 if timestamp_s.startswith('Dec') and self._logfile_dt.month == 1 else self._logfile_dt.year
+                        timestamp = pendulum.parse('%d %s' % (timestamp_year, timestamp_s), tz=pendulum.now().timezone)
+                        fields = get_tagged_fields(m.group(4))
+                        command = m.group(5).rstrip()
+                        collator.command(timestamp, fields, command)
+                    else:
+                        sys.stderr.write('warning: ignoring badly formatted line at %s:%d' % (self._logpath, loglineno))
+                except UnicodeDecodeError:
+                    sys.stderr.write('warning: ignoring badly encoded line at %s:%d' % (self._logpath, loglineno))
         except:
             sys.stderr.write('failed at %s:%d\n' % (self._logpath, loglineno))
             raise
