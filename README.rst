@@ -36,8 +36,7 @@ Alternatively, snoopy-log-collator is also on conda-forge.
 
     $ conda install snoopy-log-collator
 
-Installing snoopy-log-collator from RPM is now deprecated, and the spec file has therefore
-been removed from the repo.
+Note that snoopy-log-collator requires Python 3.
 
 Configuration
 -------------
