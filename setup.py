@@ -13,7 +13,7 @@ of invocation instances.
 setup(name='snoopy-log-collator',
       use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
-      description='Utility for managing old files in large directory structures',
+      description='Collate logfiles from snoopy logger',
       long_description=long_description,
       author='Simon Guest',
       author_email='simon.guest@tesujimath.org',
