@@ -24,7 +24,7 @@ import sys
 class Mapper(object):
     def __init__(self):
         self._rpm_by_path = {}
-        self._yum_repo_by_rpm = {}
+        self._yum_repos_by_rpm = {}
         self._username = {}
         self._isfile = {}
         self._excluded = {}
@@ -63,23 +63,22 @@ class Mapper(object):
             self._rpm_by_path[path] = package
         return package
 
-    def yum_repo(self, rpm):
-        if rpm in self._yum_repo_by_rpm:
-            repo = self._yum_repo_by_rpm[rpm]
+    def yum_repos(self, rpm):
+        if rpm in self._yum_repos_by_rpm:
+            repos = self._yum_repos_by_rpm[rpm]
         else:
-            repo = None
+            repos = set()
             yum = subprocess.Popen(["yum", "info", rpm], stdout = subprocess.PIPE, stderr = subprocess.PIPE, universal_newlines=True)
             for line in yum.stdout:
-                m = re.match(r"""From repo\s*:\s*(\S*)""", line)
+                m = re.match(r"""(From )?[Rr]epo\s*:\s*(\S*)""", line)
                 if m:
-                    repo = m.group(1)
-                    break
-            if repo is None:
+                    repos.add(m.group(2))
+            if len(repos) == 0:
                 errorline = yum.stderr.read()
                 if errorline.startswith('Error'):
                     sys.stderr.write('Mapper::yum_repo(%s) %s' % (rpm, errorline))
-            self._yum_repo_by_rpm[rpm] = repo
-        return repo
+            self._yum_repos_by_rpm[rpm] = repos
+        return repos
 
     def excluded(self, path, cls, config):
         """Look up config and return whether this path is excluded for cls."""
@@ -90,6 +89,7 @@ class Mapper(object):
             return excluded_for_class[path]
         else:
             if config.exclude_file(cls, path):
+                print('exclude %s for %s because of file exclusion' % (path, cls))
                 excluded = True
             else:
                 package = self.rpm(path)
@@ -98,14 +98,18 @@ class Mapper(object):
                 elif config.include_rpm(cls, package):
                     excluded = False
                 elif config.exclude_rpm(cls, package):
+                    print('exclude %s for %s because of rpm %s' % (path, cls, package))
                     excluded = True
                 else:
-                    repo = self.yum_repo(package)
-                    if repo is None:
+                    repos = self.yum_repos(package)
+                    if len(repos) == 0:
                         excluded = False
-                    elif config.exclude_yum_repo(cls, repo):
+                    elif config.exclude_any_yum_repos(cls, repos):
+                        print('exclude %s for %s because of yum-repos %s' % (path, cls, str(repos)))
                         excluded = True
                     else:
                         excluded = False
             excluded_for_class[path] = excluded
-            return excluded
+        if not excluded and cls != 'all':
+            print('%s not excluded for %s, rpm %s, yum-repo %s' % (path, cls, str(package), str(repos)))
+        return excluded

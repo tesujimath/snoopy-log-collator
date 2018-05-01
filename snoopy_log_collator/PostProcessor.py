@@ -38,8 +38,8 @@ class PostProcessor(object):
     def list_packages(self):
         for path in sorted(self._get_collated_files('all')):
             package = self._mapper.rpm(path)
-            repo = self._mapper.yum_repo(package) if package is not None else None
-            print('%s:%s:%s' % (str(repo), str(package), path))
+            repos = self._mapper.yum_repos(package) if package is not None else None
+            print('%s:%s:%s' % (str(repos), str(package), path))
 
     def purge_empty_dirs(self, cls):
         for root, dirs, files in os.walk(self._config.collationdir(cls)):

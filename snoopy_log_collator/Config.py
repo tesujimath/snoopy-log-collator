@@ -110,11 +110,17 @@ class Config(object):
         else:
             return False
 
-    def exclude_yum_repo(self, cls, name):
+    def exclude_any_yum_repos(self, cls, names):
         config_for_class = self._config_for_class(cls)
         if config_for_class is not None and 'exclude' in config_for_class:
             exclude = config_for_class['exclude']
-            return 'yum-repo' in exclude and name in exclude['yum-repo']
+            if 'yum-repo' in exclude:
+                for name in exclude['yum-repo']:
+                    if name in names:
+                        return True
+                return False
+            else:
+                return False
         else:
             return False
 
