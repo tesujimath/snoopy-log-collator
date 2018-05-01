@@ -15,6 +15,7 @@
 
 import os.path
 import pytoml as toml
+import re
 import sys
 
 def bare_hostname():
@@ -115,9 +116,10 @@ class Config(object):
         if config_for_class is not None and 'exclude' in config_for_class:
             exclude = config_for_class['exclude']
             if 'yum-repo' in exclude:
-                for name in exclude['yum-repo']:
-                    if name in names:
-                        return True
+                for name_re in exclude['yum-repo']:
+                    for name in names:
+                        if re.match(name_re, name):
+                            return True
                 return False
             else:
                 return False

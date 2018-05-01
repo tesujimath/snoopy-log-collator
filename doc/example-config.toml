@@ -3,7 +3,7 @@ collation-dir = "~/junk/snoopy-log/collated"
 
 [class.bifo.exclude]
 yum-repo = [
-    "anaconda",
+    "anaconda.*",
     "base",
     "centos7-os",
     "centos7-updates",
