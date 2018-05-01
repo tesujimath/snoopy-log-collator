@@ -58,7 +58,7 @@ class Config(object):
             try:
                 self._config = toml.load(f)
             except toml.TomlError as e:
-                raise ConfigError(self._filename, 'TOML error at line %d' % e.line)
+                raise ConfigError(self._filename, 'TOML error at line %d, %s' % (e.line, e.message))
         self._validate()
 
     def _validate(self):
