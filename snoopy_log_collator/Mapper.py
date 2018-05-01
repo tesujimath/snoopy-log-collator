@@ -89,7 +89,6 @@ class Mapper(object):
             return excluded_for_class[path]
         else:
             if config.exclude_file(cls, path):
-                print('exclude %s for %s because of file exclusion' % (path, cls))
                 excluded = True
             else:
                 package = self.rpm(path)
@@ -98,18 +97,14 @@ class Mapper(object):
                 elif config.include_rpm(cls, package):
                     excluded = False
                 elif config.exclude_rpm(cls, package):
-                    print('exclude %s for %s because of rpm %s' % (path, cls, package))
                     excluded = True
                 else:
                     repos = self.yum_repos(package)
                     if len(repos) == 0:
                         excluded = False
                     elif config.exclude_any_yum_repos(cls, repos):
-                        print('exclude %s for %s because of yum-repos %s' % (path, cls, str(repos)))
                         excluded = True
                     else:
                         excluded = False
             excluded_for_class[path] = excluded
-        if not excluded and cls != 'all':
-            print('%s not excluded for %s, rpm %s, yum-repo %s' % (path, cls, str(package), str(repos)))
         return excluded
