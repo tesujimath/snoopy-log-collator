@@ -86,6 +86,14 @@ class Config(object):
         else:
             return self._config['class'][cls]
 
+    def exclude_file(self, cls, name):
+        config_for_class = self._config_for_class(cls)
+        if config_for_class is not None and 'exclude' in config_for_class:
+            exclude = config_for_class['exclude']
+            return 'file' in exclude and name in exclude['file']
+        else:
+            return False
+
     def include_rpm(self, cls, name):
         config_for_class = self._config_for_class(cls)
         if config_for_class is not None and 'include' in config_for_class:

@@ -16,6 +16,10 @@ rpm = [
     "util-linux",
 ]
 
+file = [
+    "/bin/find",
+]
+
 [class.bifo.include]
 rpm = [
     "R-core",
