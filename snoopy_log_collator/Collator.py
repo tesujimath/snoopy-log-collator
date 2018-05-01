@@ -17,10 +17,13 @@ import os.path
 import pendulum
 import re
 
+from .util import bare_hostname
+
 class Collator(object):
     def __init__(self, config, mapper):
         self._config = config
         self._mapper = mapper
+        self._hostname = bare_hostname()
 
     def _output_path(self, cls, filename):
         if os.path.isabs(filename):
@@ -44,6 +47,6 @@ class Collator(object):
                         if not os.path.exists(output_dir):
                             os.makedirs(output_dir)
                     with open(output_path, 'a') as outf:
-                        outf.write('%s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), user, command))
+                        outf.write('%s %s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), self._hostname, user, command))
                     t = timestamp.int_timestamp
                     os.utime(output_path, (t, t))

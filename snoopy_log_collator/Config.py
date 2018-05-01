@@ -18,9 +18,7 @@ import pytoml as toml
 import re
 import sys
 
-def bare_hostname():
-    """Hostname without domain."""
-    return os.uname()[1].split('.')[0]
+from .util import bare_hostname
 
 def expand(s):
     return os.path.expanduser(os.path.expandvars(s))
