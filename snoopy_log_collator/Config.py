@@ -63,8 +63,11 @@ class Config(object):
         if 'class' in self._config and 'all' in self._config['class']:
             raise ConfigError(self._filename, 'invalid class "all"')
 
-    def collationdir(self, cls):
+    def localhost_collation_dir(self, cls):
         return os.path.join(expand(self._config['collation-dir']), cls, bare_hostname())
+
+    def host_collation_dir(self, cls, hostname):
+        return os.path.join(expand(self._config['collation-dir']), cls, hostname)
 
     @property
     def last_collation_file(self):
@@ -78,6 +81,9 @@ class Config(object):
     def classes(self):
         # there's always an 'all' class
         return ['all'] + list(self._config['class'])
+
+    def collated_hosts(self, cls):
+        return os.listdir(os.path.join(expand(self._config['collation-dir']), cls))
 
     def _config_for_class(self, cls):
         if 'class' not in self._config or cls not in self._config['class']:

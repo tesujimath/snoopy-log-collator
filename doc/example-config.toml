@@ -1,5 +1,6 @@
 log-dir = "~/junk/snoopy-log"  # usually "/var/log"
-collation-dir = "~/junk/snoopy-log/collated"
+#collation-dir = "~/junk/snoopy-log/collated"
+collation-dir = "/bifo/support/admin/snoopy.collation"
 
 [class.bifo.exclude]
 yum-repo = [

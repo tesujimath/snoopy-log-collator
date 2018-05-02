@@ -27,9 +27,9 @@ class Collator(object):
 
     def _output_path(self, cls, filename):
         if os.path.isabs(filename):
-            return os.path.join(self._config.collationdir(cls), filename[1:])
+            return os.path.join(self._config.localhost_collation_dir(cls), filename[1:])
         else:
-            return os.path.join(self._config.collationdir(cls), filename)
+            return os.path.join(self._config.localhost_collation_dir(cls), filename)
 
     def command(self, timestamp, fields, command):
         filename = fields['filename']
