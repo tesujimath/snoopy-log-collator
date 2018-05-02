@@ -24,27 +24,25 @@ from snoopy_log_collator.Scanner import Scanner
 
 def main():
     parser = argparse.ArgumentParser(description='collate snoopy logfiles')
-    parser.add_argument('--list-files', action='store', metavar='CLASS', help='list collated files for CLASS')
-    parser.add_argument('--list-packages', action='store', metavar='CLASS', help='list collated files for CLASS which have a package')
-    parser.add_argument('--list-excluded', action='store', metavar='CLASS', help='list collated files for CLASS which are excluded')
-    parser.add_argument('--purge-excluded', action='store', metavar='CLASS', help='remove collated files for CLASS which are excluded')
     parser.add_argument('-c', '--config', metavar='FILE', help='configuration file')
+    parser.add_argument('command', choices=['collate','list-files','list-packages','list-excluded','purge-excluded'], help='command to run')
+    parser.add_argument('args', nargs=argparse.REMAINDER, help='command arguments')
     args = parser.parse_args()
 
     try:
-        if args.list_files:
+        if args.command == 'list-files':
             p = PostProcessor(args)
-            p.list_files(args.list_files)
-        elif args.list_packages:
+            p.list_files(args.args)
+        elif args.command == 'list-packages':
             p = PostProcessor(args)
-            p.list_packages(args.list_packages)
-        elif args.list_excluded:
+            p.list_packages(args.args)
+        elif args.command == 'list-excluded':
             p = PostProcessor(args)
-            p.list_excluded(args.list_excluded)
-        elif args.purge_excluded:
+            p.list_excluded(args.args)
+        elif args.command == 'purge-excluded':
             p = PostProcessor(args)
-            p.list_excluded(args.purge_excluded, purge=True)
-        else:
+            p.list_excluded(args.args, purge=True)
+        elif args.command == 'collate':
             scanner = Scanner(args)
             scanner.scan()
     except ConfigError as e:

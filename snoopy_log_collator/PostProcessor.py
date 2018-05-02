@@ -36,36 +36,39 @@ class PostProcessor(object):
                         paths[path] = set()
                     paths[path].add(host)
 
-    def list_packages(self, cls):
+    def list_packages(self, classes):
         paths = {}
-        self._get_collated_files(cls, bare_hostname(), paths)
+        for cls in classes if len(classes) > 0 else ['all']:
+            self._get_collated_files(cls, bare_hostname(), paths)
         for path in sorted(paths.keys()):
             package = self._mapper.rpm(path)
             repos = self._mapper.yum_repos(package) if package is not None else None
             if package is not None:
                 print('%s:%s:%s' % (path, str(package), str(repos)))
 
-    def list_files(self, cls):
+    def list_files(self, classes):
         paths = {}
-        for host in self._config.collated_hosts(cls):
-            self._get_collated_files(cls, host, paths)
+        for cls in classes if len(classes) > 0 else ['all']:
+            for host in self._config.collated_hosts(cls):
+                self._get_collated_files(cls, host, paths)
         for path in sorted(paths.keys()):
             print('%s %s' % (path, ','.join(sorted(list(paths[path])))))
 
-    def list_excluded(self, cls, purge=False):
+    def list_excluded(self, classes, purge=False):
         paths = {}
-        root = self._config.localhost_collation_dir(cls)
-        self._get_collated_files(cls, bare_hostname(), paths)
-        for path in paths:
-            if self._mapper.excluded(path, cls, self._config):
-                if purge:
-                    filepath = os.path.join(root, os.path.relpath(path, '/'))
-                    print('rm %s' % filepath)
-                    os.remove(filepath)
-                else:
-                    print(path)
-        if purge:
-            self._purge_empty_dirs(cls)
+        for cls in classes if len(classes) > 0 else ['all']:
+            root = self._config.localhost_collation_dir(cls)
+            self._get_collated_files(cls, bare_hostname(), paths)
+            for path in paths:
+                if self._mapper.excluded(path, cls, self._config):
+                    if purge:
+                        filepath = os.path.join(root, os.path.relpath(path, '/'))
+                        print('rm %s' % filepath)
+                        os.remove(filepath)
+                    else:
+                        print(path)
+            if purge:
+                self._purge_empty_dirs(cls)
 
     def _purge_empty_dirs(self, cls):
         for root, dirs, files in os.walk(self._config.localhost_collation_dir(cls), topdown=False):
