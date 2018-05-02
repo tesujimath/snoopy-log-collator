@@ -95,7 +95,13 @@ class Config(object):
         config_for_class = self._config_for_class(cls)
         if config_for_class is not None and 'exclude' in config_for_class:
             exclude = config_for_class['exclude']
-            return 'file' in exclude and name in exclude['file']
+            if 'file' in exclude:
+                for name_re in exclude['file']:
+                    if re.search(name_re, name):
+                        return True
+                return False
+            else:
+                return False
         else:
             return False
 
@@ -103,7 +109,13 @@ class Config(object):
         config_for_class = self._config_for_class(cls)
         if config_for_class is not None and 'include' in config_for_class:
             include = config_for_class['include']
-            return 'rpm' in include and name in include['rpm']
+            if 'rpm' in include:
+                for name_re in include['rpm']:
+                    if re.search(name_re, name):
+                        return True
+                return False
+            else:
+                return False
         else:
             return False
 
@@ -111,7 +123,13 @@ class Config(object):
         config_for_class = self._config_for_class(cls)
         if config_for_class is not None and 'exclude' in config_for_class:
             exclude = config_for_class['exclude']
-            return 'rpm' in exclude and name in exclude['rpm']
+            if 'rpm' in exclude:
+                for name_re in exclude['rpm']:
+                    if re.search(name_re, name):
+                        return True
+                return False
+            else:
+                return False
         else:
             return False
 
@@ -122,7 +140,7 @@ class Config(object):
             if 'yum-repo' in exclude:
                 for name_re in exclude['yum-repo']:
                     for name in names:
-                        if re.match(name_re, name):
+                        if re.search(name_re, name):
                             return True
                 return False
             else:

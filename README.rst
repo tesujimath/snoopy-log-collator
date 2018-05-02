@@ -42,7 +42,7 @@ Configuration
 -------------
 
 See the See the `example configuration file <doc/example-config.toml>`__.
-Note that regexes are allowed for repo names, but not otherwise.
+The include/exclude criteria are all Python style regexes, with no anchoring by default.
 
 
 Example Use
