@@ -59,9 +59,9 @@ class Reader(object):
                         command = m.group(5).rstrip()
                         collator.command(timestamp, fields, command)
                     else:
-                        sys.stderr.write('warning: ignoring badly formatted line at %s:%d' % (self._logpath, loglineno))
+                        sys.stderr.write('warning: ignoring badly formatted line at %s:%d\n' % (self._logpath, loglineno))
                 except UnicodeDecodeError:
-                    sys.stderr.write('warning: ignoring badly encoded line at %s:%d' % (self._logpath, loglineno))
+                    sys.stderr.write('warning: ignoring badly encoded line at %s:%d\n' % (self._logpath, loglineno))
         except:
             sys.stderr.write('failed at %s:%d\n' % (self._logpath, loglineno))
             raise

@@ -27,6 +27,7 @@ from .Reader import Reader
 class Scanner(object):
 
     def __init__(self, args):
+        self._args = args
         self._config = Config(args)
         self._mapper = Mapper()
         self._collator = Collator(self._config, self._mapper)
@@ -60,9 +61,11 @@ class Scanner(object):
                 logfile_dt = pendulum.Pendulum(logfile_year, logfile_month, logfile_day, tzinfo=pendulum.now().timezone)
                 if last_collation_dt is None or last_collation_dt < logfile_dt:
                     reader = Reader(entry, logfile_dt, self._config)
-                    sys.stderr.write('collating %s\n' % entry)
+                    if self._args.verbose:
+                        sys.stdout.write('collating %s\n' % entry)
                     reader.collate_to(self._collator)
                     last_collation_dt = logfile_dt
                     self._set_last_collation(last_collation_dt)
                 else:
-                    sys.stderr.write('skipping %s\n' % entry)
+                    if self._args.verbose:
+                        sys.stdout.write('skipping %s\n' % entry)
