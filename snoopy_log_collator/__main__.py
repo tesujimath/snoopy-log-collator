@@ -26,7 +26,7 @@ def main():
     parser = argparse.ArgumentParser(description='collate snoopy logfiles')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
     parser.add_argument('-c', '--config', metavar='FILE', help='configuration file')
-    parser.add_argument('command', choices=['collate','list-files','list-packages','list-excluded','purge-excluded'], help='command to run')
+    parser.add_argument('command', choices=['collate','consolidate','list-files','list-packages','list-excluded','purge-excluded'], help='command to run')
     parser.add_argument('args', nargs=argparse.REMAINDER, help='command arguments')
     args = parser.parse_args()
 
@@ -43,6 +43,9 @@ def main():
         elif args.command == 'purge-excluded':
             p = PostProcessor(args)
             p.list_excluded(args.args, purge=True)
+        elif args.command == 'consolidate':
+            p = PostProcessor(args)
+            p.consolidate(args.args)
         elif args.command == 'collate':
             scanner = Scanner(args)
             scanner.scan()

@@ -14,10 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import os.path
+import pendulum
+import sys
 
 from .Config import Config
 from .Mapper import Mapper
-from .util import bare_hostname
+from .KeyedReader import KeyedReader
+from .KeyedReaderTree import KeyedReaderTree
+from .util import bare_hostname, append_and_set_timestamp
 
 class PostProcessor(object):
 
@@ -79,3 +84,66 @@ class PostProcessor(object):
                     print('rmdir %s ' % dirpath)
                 except:
                     pass
+
+    @classmethod
+    def timestamp(cls, line):
+        """Return just the timestamp from a line in a collated file."""
+        return pendulum.parse(line.split(maxsplit=1)[0], tz=pendulum.now().timezone)
+
+    def consolidate(self, classes):
+        for cls in classes:
+            hosts = self._config.collated_hosts(cls)
+            all_relpaths = {}
+            for host in hosts:
+                collationdir = self._config.host_collation_dir(cls, host)
+                n = len(collationdir) + 1
+                for root, dirs, files in os.walk(collationdir):
+                    for filename in files:
+                        relpath = os.path.join(root, filename)[n:]
+                        if relpath not in all_relpaths:
+                            all_relpaths[relpath] = []
+                        all_relpaths[relpath].append(host)
+            for relpath, hosts in all_relpaths.items():
+                krt = KeyedReaderTree()
+                inpaths = [os.path.join(self._config.host_collation_dir(cls, host), relpath) for host in hosts]
+                outpath = os.path.join(self._config.consolidation_dir(cls), relpath)
+                for inpath in inpaths:
+                    krt.insert(KeyedReader(inpath, self.__class__.timestamp))
+                if os.path.exists(outpath):
+                    krt.insert(KeyedReader(outpath, self.__class__.timestamp))
+                outdir = os.path.dirname(outpath)
+                if not os.path.exists(outdir):
+                    os.makedirs(outdir)
+                outpathnew = '%s.new' % outpath
+                with open(outpathnew, 'w') as f:
+                    for line in krt.lines():
+                        f.write(line)
+                os.rename(outpathnew, outpath)
+                # set the timestamp according to the last key
+                t = krt.lastkey.int_timestamp
+                os.utime(outpath, (t, t))
+        self._finalize_consolidated(classes)
+
+    def _finalize_consolidated(self, classes):
+        """Ensure the collated files don't get consolidated again, by moving them."""
+        for cls in classes:
+            hosts = self._config.collated_hosts(cls)
+            all_relpaths = {}
+            for host in hosts:
+                collationdir = self._config.host_collation_dir(cls, host)
+                n = len(collationdir) + 1
+                for root, dirs, files in os.walk(collationdir, topdown=False):
+                    for filename in files:
+                        relpath = os.path.join(root, filename)[n:]
+                        inpath = os.path.join(collationdir, relpath)
+                        outpath = os.path.join(self._config.consolidation_dir(cls, host), relpath)
+                        outdir = os.path.dirname(outpath)
+                        if not os.path.exists(outdir):
+                            os.makedirs(outdir)
+                        if not os.path.exists(outpath):
+                            os.rename(inpath, outpath)
+                        else:
+                            append_and_set_timestamp(inpath, outpath)
+                            os.remove(inpath)
+                    # remove all the directories, which should be empty now
+                    os.rmdir(root)

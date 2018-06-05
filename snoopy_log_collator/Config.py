@@ -69,6 +69,10 @@ class Config(object):
     def host_collation_dir(self, cls, hostname):
         return os.path.join(expand(self._config['collation-dir']), cls, hostname)
 
+    def consolidation_dir(self, cls, host=None):
+        subdir = 'ALL' if host is None else host
+        return os.path.join(expand(self._config['consolidation-dir']), cls, subdir)
+
     @property
     def last_collation_file(self):
         return os.path.join(expand(self._config['collation-dir']), '.%s.collated' % bare_hostname())

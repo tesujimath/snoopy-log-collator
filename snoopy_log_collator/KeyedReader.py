@@ -15,18 +15,23 @@
 
 import os
 
-def bare_hostname():
-    """Hostname without domain."""
-    return os.uname()[1].split('.')[0]
+class KeyedReader(object):
 
-def append_and_set_timestamp(inpath, outpath):
-    with open(inpath, 'r') as inf:
-        with open(outpath, 'a') as outf:
-            done = False
-            bufsize = 104857600 # 10MB at a time
-            bytes = inf.read(bufsize)
-            while bytes != '':
-                outf.write(bytes)
-                bytes = inf.read(bufsize)
-    t = os.stat(inpath).st_mtime
-    os.utime(outpath, (t, t))
+    def __init__(self, path, keyfn):
+        self._path = path
+        self._f = open(path, 'r')
+        self._keyfn = keyfn
+        self.next()
+
+    def __str__(self):
+        return 'KeyedReader(%s)' % self._path
+
+    def next(self):
+        if self._f is not None:
+            self.line = self._f.readline()
+            if self.line != '':
+                self.key = self._keyfn(self.line)
+            else:
+                self.key = None
+                self._f.close()
+                self._f = None

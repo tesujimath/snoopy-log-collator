@@ -12,13 +12,18 @@ output:
 
 ::
 
-    20180312-16:54:38 guestsi /usr/bin/gunzip -c /usr/share/man/man1/condor_q.1.gz
-    20180313-12:57:50 mccullocha /usr/bin/gunzip -c /usr/share/man/man1/grep.1.gz
-    20180313-12:57:50 mccullocha /usr/bin/gunzip -c /usr/share/man/man1/grep.1.gz
-    20180313-12:57:50 mccullocha /usr/bin/gunzip -c /usr/share/man/man1/grep.1.gz
-    20180315-14:50:54 guestsi /usr/bin/gunzip -c /usr/share/man/man1/sh.1.gz
-    20180315-14:50:54 guestsi /usr/bin/gunzip -c /usr/share/man/man1/sh.1.gz
-    20180315-14:50:54 guestsi /usr/bin/gunzip -c /usr/share/man/man1/sh.1.gz
+    20180312-16:54:38 invbfodp01 guestsi /usr/bin/gunzip -c /usr/share/man/man1/condor_q.1.gz
+    20180313-12:57:50 invbfodp01 mccullocha /usr/bin/gunzip -c /usr/share/man/man1/grep.1.gz
+    20180313-12:57:50 invbfodp01 mccullocha /usr/bin/gunzip -c /usr/share/man/man1/grep.1.gz
+    20180313-12:57:50 invbfodp01 mccullocha /usr/bin/gunzip -c /usr/share/man/man1/grep.1.gz
+    20180315-14:50:54 invbfodp01 guestsi /usr/bin/gunzip -c /usr/share/man/man1/sh.1.gz
+    20180315-14:50:54 invbfodp01 guestsi /usr/bin/gunzip -c /usr/share/man/man1/sh.1.gz
+    20180315-14:50:54 invbfodp01 guestsi /usr/bin/gunzip -c /usr/share/man/man1/sh.1.gz
+
+Collation is run on each individual server, and ideally the ``collation-dir`` is
+on a fileserver.  A second phase, consolidation, is used to merge all the
+separate collated files into a single instance across all servers.
+Consolidation is run just once, rather than on each individual server.
 
 Installation
 ------------
@@ -50,7 +55,8 @@ Example Use
 
 ::
 
-    $ snoopy_log_collator -c example-config.toml
+    $ snoopy_log_collator -c example-config.toml collate bifo
+    $ snoopy_log_collator -c example-config.toml consolidate bifo
 
 Notes
 -----

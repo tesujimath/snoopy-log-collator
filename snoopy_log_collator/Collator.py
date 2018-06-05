@@ -25,7 +25,7 @@ class Collator(object):
         self._mapper = mapper
         self._hostname = bare_hostname()
 
-    def _output_path(self, cls, filename):
+    def _outpath(self, cls, filename):
         if os.path.isabs(filename):
             return os.path.join(self._config.localhost_collation_dir(cls), filename[1:])
         else:
@@ -41,12 +41,12 @@ class Collator(object):
         if self._mapper.isfile(filepath):
             for cls in self._config.classes:
                 if not self._mapper.excluded(filepath, cls, self._config):
-                    output_path = self._output_path(cls, filepath)
-                    if not os.path.exists(output_path):
-                        output_dir = os.path.dirname(output_path)
-                        if not os.path.exists(output_dir):
-                            os.makedirs(output_dir)
-                    with open(output_path, 'a') as outf:
+                    outpath = self._outpath(cls, filepath)
+                    if not os.path.exists(outpath):
+                        outdir = os.path.dirname(outpath)
+                        if not os.path.exists(outdir):
+                            os.makedirs(outdir)
+                    with open(outpath, 'a') as outf:
                         outf.write('%s %s %s %s\n' % (timestamp.strftime('%Y%m%d-%H:%M:%S'), self._hostname, user, command))
                     t = timestamp.int_timestamp
-                    os.utime(output_path, (t, t))
+                    os.utime(outpath, (t, t))
