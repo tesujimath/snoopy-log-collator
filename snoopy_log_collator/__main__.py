@@ -45,7 +45,7 @@ def main():
             p.list_excluded(args.args, purge=True)
         elif args.command == 'consolidate':
             p = PostProcessor(args)
-            p.consolidate(args.args)
+            p.consolidate()
         elif args.command == 'collate':
             scanner = Scanner(args)
             scanner.scan()

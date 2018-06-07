@@ -83,7 +83,11 @@ class Config(object):
 
     @property
     def classes(self):
-        # there's always an 'all' class
+        return list(self._config['class'])
+
+    @property
+    def classes_with_all(self):
+        # add the pseudo 'all' class
         return ['all'] + list(self._config['class'])
 
     def collated_hosts(self, cls):
