@@ -23,7 +23,7 @@ def get_tagged_fields(s):
     """Extract tagged snoopy fields as a dict."""
     # Alas embedded spaces cause difficulty, as snoopy doesn't quote them in the logfile.
     # We therefore split on a cunning regex
-    cunningRE = re.compile(r"""(\s+\w+:)""")
+    cunningRE = re.compile(r"""(\s+\S+:)""")
     cunningSplit = re.split(cunningRE, s)
     toks = cunningSplit[0].split(':', 1) + cunningSplit[1:]
     fields = {}
@@ -40,7 +40,7 @@ class Reader(object):
         self._logpath = os.path.join(self._config.logdir, log)
 
     def collate_to(self, collator):
-        loglineRE = re.compile(r"""^(\w+\s+\d+\s+\d+:\d+:\d+)\s+(\w+)\s+\w+\[(\d+)\]:\s+\[([^\]]*)\]:\s+(.*)$""")
+        loglineRE = re.compile(r"""^(\S+\s+\d+\s+\d+:\d+:\d+)\s+(\S+)\s+\S+\[(\d+)\]:\s+\[([^\]]*)\]:\s+(.*)$""")
         logf = gzip.open(self._logpath)
         loglineno = 0
         try:
