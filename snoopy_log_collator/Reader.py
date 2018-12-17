@@ -23,7 +23,7 @@ def get_tagged_fields(s):
     """Extract tagged snoopy fields as a dict."""
     # Alas embedded spaces cause difficulty, as snoopy doesn't quote them in the logfile.
     # We therefore split on a cunning regex
-    cunningRE = re.compile(r"""(\s+\S+:)""")
+    cunningRE = re.compile(r"""(\s+[a-z]+:)""")
     cunningSplit = re.split(cunningRE, s)
     toks = cunningSplit[0].split(':', 1) + cunningSplit[1:]
     fields = {}
@@ -31,6 +31,8 @@ def get_tagged_fields(s):
         tag = toks[2 * i].lstrip().rstrip(':')
         value = toks[2 * i + 1]
         fields[tag] = value
+    if 'filename' not in fields:
+        sys.stderr.write("warning: get_tagged_fields failed to find filename for %s\n" % s)
     return fields
 
 class Reader(object):
