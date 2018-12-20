@@ -145,4 +145,9 @@ class PostProcessor(object):
                         append_and_set_timestamp(inpath, outpath)
                         os.remove(inpath)
                 # remove all the directories, which should be empty now
-                os.rmdir(root)
+                # if not, it's because someone else is busy writing here,
+                # so ignore that for now, and we'll pick it up next time
+                try:
+                    os.rmdir(root)
+                except OSError:
+                    pass
