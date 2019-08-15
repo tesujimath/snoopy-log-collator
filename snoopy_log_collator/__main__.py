@@ -21,17 +21,20 @@ import sys
 from snoopy_log_collator.Config import ConfigError
 from snoopy_log_collator.PostProcessor import PostProcessor
 from snoopy_log_collator.Scanner import Scanner
+from snoopy_log_collator.version import get_version
 
 def main():
     parser = argparse.ArgumentParser(description='collate snoopy logfiles')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
     parser.add_argument('-c', '--config', metavar='FILE', help='configuration file')
-    parser.add_argument('command', choices=['collate','consolidate','list-files','list-packages','list-excluded','purge-excluded'], help='command to run')
+    parser.add_argument('command', choices=['collate','consolidate','list-files','list-packages','list-excluded','purge-excluded','version'], help='command to run')
     parser.add_argument('args', nargs=argparse.REMAINDER, help='command arguments')
     args = parser.parse_args()
 
     try:
-        if args.command == 'list-files':
+        if args.command == 'version':
+            print('snoopy-log-collator v%s' % get_version())
+        elif args.command == 'list-files':
             p = PostProcessor(args)
             p.list_files(args.args)
         elif args.command == 'list-packages':
