@@ -56,7 +56,7 @@ class Reader(object):
                         # except when we roll over from Dec to Jan
                         timestamp_s = m.group(1)
                         timestamp_year = self._logfile_dt.year - 1 if timestamp_s.startswith('Dec') and self._logfile_dt.month == 1 else self._logfile_dt.year
-                        timestamp = pendulum.parse('%d %s' % (timestamp_year, timestamp_s), tz=pendulum.now().timezone)
+                        timestamp = pendulum.parse('%d %s' % (timestamp_year, timestamp_s), tz=pendulum.now().timezone, strict=False)
                         fields = get_tagged_fields(m.group(4))
                         command = m.group(5).rstrip()
                         collator.command(timestamp, fields, command)

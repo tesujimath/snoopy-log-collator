@@ -39,7 +39,7 @@ setup(name='snoopy-log-collator',
       },
       license='GPLv3',
       install_requires=[
-          'pendulum',
+          'pendulum>=2',
           'pytoml',
           'setuptools',
       ],

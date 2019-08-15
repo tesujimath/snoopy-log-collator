@@ -38,7 +38,7 @@ class Scanner(object):
             with open(self._config.last_collation_file) as f:
                 m = timestampRE.match(f.read())
                 if m:
-                    return pendulum.Pendulum(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=pendulum.now().timezone)
+                    return pendulum.DateTime(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=pendulum.now().timezone)
             return None
         except (IOError, ValueError):
             return None
@@ -58,7 +58,7 @@ class Scanner(object):
                 logfile_year = int(m.group(1))
                 logfile_month = int(m.group(2))
                 logfile_day = int(m.group(3))
-                logfile_dt = pendulum.Pendulum(logfile_year, logfile_month, logfile_day, tzinfo=pendulum.now().timezone)
+                logfile_dt = pendulum.DateTime(logfile_year, logfile_month, logfile_day, tzinfo=pendulum.now().timezone)
                 if last_collation_dt is None or last_collation_dt < logfile_dt:
                     reader = Reader(entry, logfile_dt, self._config)
                     if self._args.verbose:
