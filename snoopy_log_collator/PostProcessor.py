@@ -111,9 +111,7 @@ class PostProcessor(object):
                     krt.insert(KeyedReader(inpath, self.__class__.timestamp))
                 if os.path.exists(outpath):
                     krt.insert(KeyedReader(outpath, self.__class__.timestamp))
-                outdir = os.path.dirname(outpath)
-                if not os.path.exists(outdir):
-                    os.makedirs(outdir)
+                os.makedirs(os.path.dirname(outpath), exist_ok=True)
                 outpathnew = '%s.new' % outpath
                 with open(outpathnew, 'w') as f:
                     for line in krt.lines():
@@ -136,9 +134,7 @@ class PostProcessor(object):
                     relpath = os.path.join(root, filename)[n:]
                     inpath = os.path.join(collationdir, relpath)
                     outpath = os.path.join(self._config.consolidation_dir(cls, host), relpath)
-                    outdir = os.path.dirname(outpath)
-                    if not os.path.exists(outdir):
-                        os.makedirs(outdir)
+                    os.makedirs(os.path.dirname(outpath), exist_ok=True)
                     if not os.path.exists(outpath):
                         os.rename(inpath, outpath)
                     else:
