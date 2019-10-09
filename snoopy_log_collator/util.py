@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import pendulum
 
 def bare_hostname():
     """Hostname without domain."""
@@ -30,3 +31,9 @@ def append_and_set_timestamp(inpath, outpath):
                 bytes = inf.read(bufsize)
     t = os.stat(inpath).st_mtime
     os.utime(outpath, (t, t))
+
+def timestamp_str(t0):
+    return t0.strftime('%Y%m%d-%H:%M:%S')
+
+def timestamp_from_str(s):
+    return pendulum.from_format(s, 'YYYYMMDD-HH:mm:ss', tz=pendulum.now().timezone)

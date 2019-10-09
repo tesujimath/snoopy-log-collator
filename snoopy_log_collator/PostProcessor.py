@@ -15,14 +15,13 @@
 
 import os
 import os.path
-import pendulum
 import sys
 
 from .Config import Config
 from .Mapper import Mapper
 from .KeyedReader import KeyedReader
 from .KeyedReaderTree import KeyedReaderTree
-from .util import bare_hostname, append_and_set_timestamp
+from .util import bare_hostname, append_and_set_timestamp, timestamp_from_str
 
 class PostProcessor(object):
 
@@ -88,7 +87,7 @@ class PostProcessor(object):
     @classmethod
     def timestamp(cls, line):
         """Return just the timestamp from a line in a collated file."""
-        return pendulum.parse(line.split(maxsplit=1)[0], tz=pendulum.now().timezone)
+        return timestamp_from_str(line.split(maxsplit=1)[0])
 
     def consolidate(self):
         for cls in self._config.classes:
